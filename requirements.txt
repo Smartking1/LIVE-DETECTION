@@ -3,3 +3,7 @@ pandas
 opencv-python
 face-recognition
 requests
+flask
+PassportEye
+pillow 
+pytesseract
