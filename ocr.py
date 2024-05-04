@@ -10,7 +10,7 @@ Original file is located at
 import cv2
 import pytesseract
 import re
-from google.colab.patches import cv2_imshow
+#from google.colab.patches import cv2_imshow
 
 def extract_info_from_id_card(image_path):
     image = cv2.imread(image_path)
@@ -48,7 +48,7 @@ def extract_info_from_id_card(image_path):
     }
 
 
-image_path = '/content/drive/MyDrive/testcard.jpeg'
+image_path = 'C:/Users/hp/Live Detection/LIVE-DETECTION/ID_Storage/photo_2024-05-03_22-18-29.jpg'
 extracted_info = extract_info_from_id_card(image_path)
 print(extracted_info['name'])
 cv2_imshow( extracted_info['face'])
@@ -103,6 +103,5 @@ text = extract_info_from_id_card(image_path)
 ttext = extract_info_from_text(text)
 print(ttext)
 
-!sudo apt-get install tesseract-ocr
-!pip install pytesseract
+
 

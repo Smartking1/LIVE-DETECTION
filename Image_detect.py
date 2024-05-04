@@ -1,49 +1,23 @@
-from flask import Flask, request, render_template, flash, redirect
-from PassportEye import read_mrz
+import cv2
 from PIL import Image
 import pytesseract
-import os
 
-app = Flask(__name__)
-
-UPLOAD_FOLDER = 'uploads'
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-
-def extract_info(image_path):
-    # Read MRZ (Machine Readable Zone) from the ID card
-    mrz = read_mrz(image_path)
-    
-    # Extract photo from ID card
-    photo = mrz.visual_data()['photo']
-
-    # Convert the photo to a PIL Image object
+def extract_info_with_opencv(image_path):
+    image = cv2.imread(image_path)
+    gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    _, binary_image = cv2.threshold(gray_image, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
+    contours, _ = cv2.findContours(binary_image, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    contours = sorted(contours, key=cv2.contourArea, reverse=True)[:1]
+    x, y, w, h = cv2.boundingRect(contours[0])
+    photo = image[y:y+h, x:x+w]
     photo_image = Image.fromarray(photo)
-
-    # Extract text using tesseract-ocr
     text = pytesseract.image_to_string(photo_image)
-    
     return text, photo_image
 
-@app.route('/', methods=['GET', 'POST'])
-def upload_file():
-    if request.method == 'POST':
-        # Check if the post request has the file part
-        if 'file' not in request.files:
-            flash('No file part')
-            return redirect(request.url)
-        file = request.files['file']
-        # If user does not select file, browser also
-        # submit an empty part without filename
-        if file.filename == '':
-            flash('No selected file')
-            return redirect(request.url)
-        if file:
-            filename = file.filename
-            file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-            file.save(file_path)
-            extracted_text, extracted_photo = extract_info(file_path)
-            return render_template('result.html', text=extracted_text, photo=extracted_photo)
-    return render_template('upload.html')
+# Example usage:
+image_path = "ID_Storage/photo_2024-05-03_22-18-29.jpg"
+text_opencv, photo_opencv = extract_info_with_opencv(image_path)
 
-if __name__ == '__main__':
-    app.run(debug=True)
+# Print extracted text and display photo
+print("Text extracted using OpenCV:", text_opencv)
+photo_opencv.show()

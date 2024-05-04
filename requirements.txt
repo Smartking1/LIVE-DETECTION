@@ -4,6 +4,7 @@ opencv-python
 face-recognition
 requests
 flask
-PassportEye
+PassportEye == 2.2.1
 pillow 
-pytesseract
+pytesseract == 0.3.7
+keras-ocr == 0.9.3
