@@ -1,10 +1,6 @@
 import cv2
 import pytesseract
 import re
-<<<<<<< HEAD
-#from google.colab.patches import cv2_imshow
-=======
->>>>>>> f10216bad00a86ae02d7e94d9ff958b1d1ebcbff
 
 def extract_info_from_id_card(image_path):
     image = cv2.imread(image_path)
@@ -31,16 +27,9 @@ def extract_info_from_id_card(image_path):
     return face_image
 
 
-<<<<<<< HEAD
-image_path = 'C:/Users/hp/Live Detection/LIVE-DETECTION/ID_Storage/photo_2024-05-03_22-18-29.jpg'
-extracted_info = extract_info_from_id_card(image_path)
-print(extracted_info['name'])
-cv2_imshow( extracted_info['face'])
-=======
 image_path = r'C:\Users\Laptop\Downloads\OCRA\LIVE-DETECTION\testcard.jpeg'
 extracted_image = extract_info_from_id_card(image_path)
 cv2.imshow('Extracted Face', extracted_image)
->>>>>>> f10216bad00a86ae02d7e94d9ff958b1d1ebcbff
 cv2.waitKey(0)
 cv2.destroyAllWindows()
 
