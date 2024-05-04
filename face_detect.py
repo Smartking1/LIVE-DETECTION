@@ -3,32 +3,16 @@ import numpy as np
 import face_recognition
 import os
 
-path = 'C:/Users/hp/Downloads/AttendRx-Face-Recognition-Attendance-System-main/FaceRecognition_Code_AttendRx/ImagesBasic'
-images = []
-classNames = []
-mylist = os.listdir(path)
-print(mylist)
-for cl in mylist:
-    curImg = cv2.imread(f'{path}/{cl}')
-    images.append(curImg)
-    classNames.append(os.path.splitext(cl)[0])
-print(classNames)
+path = 'extracted_photos/extracted_photo.jpg'
+extracted_image_path = r'C:\Users\Laptop\Downloads\OCRA\extracted_photos\extracted_photo.jpg'
+extracted_image = face_recognition.load_image_file(extracted_image_path)
 
-
-def find_encodings(images):
-    encodeList = []
-    i = 0
-    for img in images:
-        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-        encode = face_recognition.face_encodings(img)[0]
-        encodeList.append(encode)
-        print(f'Encoding {i}/{len(mylist)} done!')
-        i = i + 1
+def find_encodings(image):
+    img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+    encode = face_recognition.face_encodings(img)[0]
     return encodeList
 
-
-encodelistknown = find_encodings(images)
-print('Encoding Complete!')
+encodelistknown = find_encodings(extracted_image)
 
 # Initialize the VideoCapture object for the laptop camera
 cap = cv2.VideoCapture(0)
@@ -37,11 +21,9 @@ while True:
     # Capture frame-by-frame
     ret, img = cap.read()
 
-    
-    imgS = cv2.cvtColor(imgS, cv2.COLOR_BGR2RGB)
-
-    faceCurFrame = face_recognition.face_locations(imgS)
-    encodesCurFrame = face_recognition.face_encodings(imgS, faceCurFrame)
+    img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+    faceCurFrame = face_recognition.face_locations(img)
+    encodesCurFrame = face_recognition.face_encodings(img, faceCurFrame)
 
     for encodeFace, faceLoc in zip(encodesCurFrame, faceCurFrame):
         matches = face_recognition.compare_faces(encodelistknown, encodeFace)
@@ -50,8 +32,6 @@ while True:
         matchIndex = np.argmin(faceDis)
 
         if matches[matchIndex]:
-            name = classNames[matchIndex].upper()
-            print(name)
             y1, x2, y2, x1 = faceLoc
             y1, x2, y2, x1 = y1 * 4, x2 * 4, y2 * 4, x1 * 4
             cv2.rectangle(img, (x1, y1), (x2, y2), (0, 255, 0), 2)

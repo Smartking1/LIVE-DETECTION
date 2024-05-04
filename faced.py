@@ -1,25 +1,21 @@
 import cv2
 import numpy as np
 import face_recognition
-import sqlite3
+import os
 
-# Connect to the SQLite database
-conn = sqlite3.connect('faces.db')
-cursor = conn.cursor()
+# Load the image extracted from the ID card
+extracted_image_path = r'C:\Users\Laptop\Downloads\OCRA\extracted_photos\extracted_photo.jpg'
+extracted_image = face_recognition.load_image_file(extracted_image_path)
+extracted_face_encoding = face_recognition.face_encodings(extracted_image)[0]
 
-# Retrieve stored face images from the database
-cursor.execute("SELECT image FROM face_images")
-known_faces_data = cursor.fetchall()
-known_face_encodings = [np.frombuffer(data[0], dtype=np.uint8) for data in known_faces_data]
-conn.close()
-
+# Initialize the VideoCapture object for the laptop camera
 cap = cv2.VideoCapture(0)
 
 while True:
     # Capture frame-by-frame
     ret, img = cap.read()
 
-    img = cv2.resize(img, (0, 0), None, 0.25, 0.25)
+    # Convert the frame to RGB
     img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 
     # Find face locations and encodings in the current frame
@@ -27,14 +23,17 @@ while True:
     face_encodings = face_recognition.face_encodings(img_rgb, face_locations)
 
     for face_encoding, (top, right, bottom, left) in zip(face_encodings, face_locations):
-        # Compare face encoding with known face encodings
-        matches = face_recognition.compare_faces(known_face_encodings, face_encoding, tolerance=0.6)
+        # Compare face encoding with the extracted face encoding
+        match = face_recognition.compare_faces([extracted_face_encoding], face_encoding)[0]
 
-        if any(matches):
-            # Draw rectangle around the face region
-            cv2.rectangle(img, (left, top), (right, bottom), (0, 255, 0), 2)
-            # Print message if faces match
-            print("Ahoy! The faces matched")
+        # If a match is found, display a message
+        if match:
+            cv2.putText(img, 'Ahoy! Faces match', (left, top - 10), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+        else:
+            cv2.putText(img, 'Faces don\'t match', (left, top - 10), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
+
+        # Draw a rectangle around the face
+        cv2.rectangle(img, (left, top), (right, bottom), (0, 255, 0) if match else (0, 0, 255), 2)
 
     # Display the resulting frame
     cv2.imshow('Face Recognition', img)
@@ -46,4 +45,3 @@ while True:
 # Release the VideoCapture object and close all windows
 cap.release()
 cv2.destroyAllWindows()
-
