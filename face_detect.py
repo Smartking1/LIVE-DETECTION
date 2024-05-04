@@ -3,8 +3,8 @@ import numpy as np
 import face_recognition
 import os
 
-path = 'extracted_photos/extracted_photo.jpg'
-extracted_image_path = r'C:\Users\Laptop\Downloads\OCRA\extracted_photos\extracted_photo.jpg'
+#path = 'extracted_photos/extracted_photo.jpg'
+extracted_image_path = r'C:\Users\hp\Live Detection\LIVE-DETECTION\extracted_photos\extracted_photo.jpg'
 extracted_image = face_recognition.load_image_file(extracted_image_path)
 
 def find_encodings(image):

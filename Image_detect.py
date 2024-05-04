@@ -39,7 +39,7 @@ def extract_info_with_opencv(image_path):
 
 
 # Example usage:
-image_path = r"C:\Users\Laptop\Downloads\OCRA\LIVE-DETECTION\testcard.jpeg"
+image_path = r"C:\Users\hp\Live Detection\LIVE-DETECTION\ID_Storage\photo_2024-05-03_22-18-29.jpg"
 text_opencv, photo_opencv = extract_info_with_opencv(image_path)
 
 
