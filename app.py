@@ -1,19 +1,20 @@
 import streamlit as st
-from Image_detect import extract_info_with_opencv
+from Image_detect import extract_info_with_opencv, create_database
 import cv2
 import numpy as np
-from faced import FaceDetector
+
 
 def main():
-    st.title('ID Card Extraction and Matching')
+    st.title('ID Card Matching')
 
     # File uploader for ID card image
     st.subheader('Upload ID Card Image')
     id_card_image = st.file_uploader('Upload an image', type=['jpg', 'png'])
+    conn, cursor = create_database()
 
     if id_card_image:
         # Extract text and photo from the uploaded ID card using OpenCV
-        extracted_text, extracted_photo = extract_info_with_opencv(id_card_image)
+        extracted_text, extracted_photo = extract_info_with_opencv(id_card_image,cursor, conn)
         
         # Display the extracted text
         st.subheader('Extracted Text:')
@@ -22,9 +23,8 @@ def main():
         # Display the extracted photo
         st.subheader('Extracted Photo:')
         st.image(extracted_photo, caption='Extracted Photo', use_column_width=True)
+        extracted_face_encoding = face_recognition.face_encodings(extracted_photo)[0]
 
-        # Initialize the face detector
-        face_detector = FaceDetector()
 
         # Start the camera
         cap = cv2.VideoCapture(0)
@@ -33,18 +33,16 @@ def main():
             # Capture frame-by-frame
             ret, img = cap.read()
 
-            # Detect faces in the frame
-            faces = face_detector.predict(img)
+            # Convert the frame to RGB
+            img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 
-            # Draw rectangles around the faces
-            for x, y, w, h, p in faces:
-                cv2.rectangle(img, (x, y), (x+w, y+h), (0, 255, 0), 2)
+            # Find face locations and encodings in the current frame
+            face_locations = face_recognition.face_locations(img_rgb)
+            face_encodings = face_recognition.face_encodings(img_rgb, face_locations)
 
-                # Compare face detection with the extracted face from the ID card
-                extracted_image = np.array(extracted_photo)
-                extracted_face_encoding = face_detector.extract_face_features(extracted_image)
-                detected_face_encoding = face_detector.extract_face_features(img[y:y+h, x:x+w])
-                match = np.array_equal(extracted_face_encoding, detected_face_encoding)
+            for face_encoding, (top, right, bottom, left) in zip(face_encodings, face_locations):
+            # Compare face encoding with the extracted face encoding
+                match = face_recognition.compare_faces([extracted_face_encoding], face_encoding)[0]
 
                 # If a match is found, display a message
                 if match:
