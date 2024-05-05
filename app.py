@@ -24,7 +24,7 @@ def main():
         # Display the extracted photo
         st.subheader('Extracted Photo:')
         st.image(extracted_photo, caption='Extracted Photo', use_column_width=True)
-        extracted_photo = np.array(extracted_photo)
+        #extracted_photo = np.array(extracted_photo)
         extracted_face_encoding = face_recognition.face_encodings(extracted_photo)[0]
 
 
@@ -48,7 +48,7 @@ def main():
 
                 # If a match is found, display a message
                 if match:
-                    st.success('Ahoy! Faces match')
+                    st.success('Faces match')
                 else:
                     st.error('Faces don\'t match')
 
