@@ -2,6 +2,7 @@ import streamlit as st
 from Image_detect import extract_info_with_opencv, create_database
 import cv2
 import numpy as np
+from faced import face_recognition
 
 
 def main():
@@ -23,6 +24,7 @@ def main():
         # Display the extracted photo
         st.subheader('Extracted Photo:')
         st.image(extracted_photo, caption='Extracted Photo', use_column_width=True)
+        extracted_photo = np.array(extracted_photo)
         extracted_face_encoding = face_recognition.face_encodings(extracted_photo)[0]
 
 
